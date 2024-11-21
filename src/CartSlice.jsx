@@ -4,6 +4,7 @@ export const CartSlice = createSlice({
   name: 'cart',
   initialState: {
     items: [], // Initialize items as an empty array
+    totalItems: 0
   },
   reducers: {
     addItem: (state, action) => {
@@ -11,9 +12,12 @@ export const CartSlice = createSlice({
       const existingItem = state.items.find(item => item.name === name);
       if(existingItem){
        existingItem.quantity++;
+       state.totalItems = state.totalItems + 1;
       }
       else{
         state.items.push({ name, image, cost, quantity: 1 });
+        state.totalItems = state.totalItems + 1;
+
       }
     
     },
@@ -21,19 +25,21 @@ export const CartSlice = createSlice({
       const { name } = action.payload;
       const index = state.items.findIndex(item => item.name === name);
       if(index > -1){
+        state.totalItems = state.totalItems - (state.items[index].quantity);
         state.items.splice(index, 1);
+       
       }
 
-      state.items = state.items.filter(item => item.name !== name);
+      // state.items = state.items.filter(item => item.name !== name);
     },
     updateQuantity: (state, action) => {
       const { name, quantity } = action.payload;
       const index = state.items.findIndex(item => item.name === name);
-      if(index > -1){
+      if (index > -1) {
+        const oldQuantity = state.items[index].quantity;
         state.items[index].quantity = quantity;
+        state.totalItems = state.totalItems - oldQuantity + quantity; // Met à jour totalItems correctement
       }
-
-    
     },
   },
 });
