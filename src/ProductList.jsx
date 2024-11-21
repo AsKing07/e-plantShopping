@@ -1,10 +1,13 @@
 import React, { useState,useEffect } from 'react';
 import './ProductList.css'
 import CartItem from './CartItem';
+import { useDispatch } from 'react-redux';
+import { addItem } from './CartSlice';
 function ProductList() {
     const [showCart, setShowCart] = useState(false); 
     const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
-
+    const [addedToCard, setAddedToCard] = useState({});
+    const dispatch = useDispatch();
     const plantsArray = [
         {
             category: "Air Purifying Plants",
@@ -246,6 +249,17 @@ const handlePlantsClick = (e) => {
     e.preventDefault();
     setShowCart(false);
   };
+
+  const handleAddToCart = (product) => {
+    // dispatch(addToCart(item));
+    dispatch(addItem(product));
+    setAddedToCard((prevState) => ({
+       ...prevState,
+       [product.name]: true, // Set the product name as key and value as true to indicate it's added to cart
+     }));
+    //   localStorage.setItem('addedToCard', JSON.stringify(addedToCard));
+    }
+
     return (
         <div>
              <div className="navbar" style={styleObj}>
@@ -268,6 +282,28 @@ const handlePlantsClick = (e) => {
         </div>
         {!showCart? (
         <div className="product-grid">
+            {plantsArray.map((category, index)=>(
+                <>
+                <h1 key={index}>{category.category}</h1>
+                <div className="product-list">
+                {category.plants.map((plant, index)=>(
+                   
+                        <div className="product-card" key={index}>
+                            <h2 className="product-title">{plant.name}</h2>
+                            <img className="product-image" src={plant.image} alt={plant.name}/>
+                            <p className="product-description">{plant.description}</p>
+                            <p className="product-price">{plant.cost}</p>
+                            <button className={addedToCard[plant.name]? 'product-button btn-disabled' : 'product-button'} onClick={()=>handleAddToCart(plant)}> {addedToCard[plant.name]?"Already in Cart": "Add to Cart"} </button>
+                        </div>
+
+                    
+                ))
+             
+            }
+               </div>
+            </>
+            ))}
+
 
 
         </div>
